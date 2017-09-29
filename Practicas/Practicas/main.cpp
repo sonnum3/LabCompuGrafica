@@ -2,7 +2,7 @@
 //************************************************************//
 //************************************************************//
 //************** Alumno (s): González Colín Fernando	******//
-//*************	Ejercicio práctica 6					******//
+//*************	Ejercicio práctica 7					******//
 //*************											******//
 //************************************************************//
 #include "Main.h"
@@ -45,17 +45,49 @@ GLfloat SunDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };			// Diffuse Light Values
 GLfloat SunSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
 GLfloat SunPosition[]= { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
 
-GLfloat EarthDiffuse[]= { 0.2f, 0.2f, 1.0f, 1.0f };			// Tierra
+GLfloat MercuDiffuse[]= { 0.35,0.35,0.35, 1.0f };			// Mercurio
+GLfloat MercuSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
+GLfloat MercuShininess[] = { 100.0 };
+
+GLfloat VenusDiffuse[]= { 0.7,0.3,0.0, 1.0f };			// Venus
+GLfloat VenusSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
+GLfloat VenusShininess[] = { 100.0 };
+
+GLfloat EarthDiffuse[]= { 0.0f, 0.87f, 1.0f, 1.0f };			// Tierra
 GLfloat EarthSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
-GLfloat EarthShininess[] = { 50.0 };
+GLfloat EarthShininess[] = { 100.0 };
 
-GLfloat MoonDiffuse[]= { 0.8f, 0.8f, 0.8f, 1.0f };			// Luna
+GLfloat MoonDiffuse[]= { 0.8f, 0.8f, 0.8f, 1.0f };			// LunaTierra
 GLfloat MoonSpecular[] = { 1.0, 1.0, 1.0, 1.0 };
-GLfloat MoonShininess[] = { 50.0 };
+GLfloat MoonShininess[] = { 100.0 };
 
-GLfloat MarsDiffuse[]= { 0.8f, 0.4f, 0.1f, 1.0f };			// Marte
+GLfloat MarsDiffuse[]= { 1.0f, 0.4f, 0.1f, 1.0f };			// Marte
 GLfloat MarsSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat MarsShininess[] = { 50.0 };
+GLfloat MarsShininess[] = {100.0 };
+
+GLfloat ZeusDiffuse[]= { 1.0f, 0.0f, 0.0f, 1.0f };			// jupiter
+GLfloat ZeusSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat ZeusShininess[] = {100.0 };
+
+GLfloat SaturnoDiffuse[]= { 1.0f, 0.4f, 0.1f, 1.0f };			// Saturno
+GLfloat SaturnoSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat SaturnoShininess[] = {100.0 };
+
+GLfloat Anillo1Diffuse[] = {0.96, 0.84, 0.77, 1.0f };			// Anillo1
+GLfloat Anillo1Specular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat Anillo1Shininess[] = { 100.0 };
+
+GLfloat Anillo2Diffuse[] = { 0.77, 0.94, 0.96, 1.0f };			// Anillo2
+GLfloat Anillo2Specular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat Anillo2Shininess[] = { 100.0 };
+
+GLfloat UranoDiffuse[] = { 0.3,0.3,0.9, 1.0f };			// Urano
+GLfloat UranoSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat UranoShininess[] = { 100.0 };
+
+GLfloat NeptunoDiffuse[] = { 0.5,0.75,1.0, 1.0f };			// Neptuno
+GLfloat NeptunoSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat NeptunoShininess[] = { 100.0 };
 
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
@@ -66,7 +98,11 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
-	
+	//Para emplear luces
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, SunDiffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, SunSpecular);
 }
 
 void display ( void )   // Creamos la funcion donde se dibuja
@@ -79,19 +115,24 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glRotatef(angY, 0.0, 0.0, 1.0);	
 		
 	glPushMatrix();
-	glRotatef(sol,0.0,1.0,0.0);	//El Sol gira sobre su eje	
-	glColor3f( 0.9,0.9,0.3);	//Sol amarillo
-	glutWireSphere(1.9,12,12);  //Draw Sun (radio,H,V);
+		glRotatef(sol,0.0,1.0,0.0);	//El Sol gira sobre su eje	
+		glColor3f( 0.9,0.9,0.3);	//Sol amarillo
+		glLightfv(GL_LIGHT1,GL_POSITION,SunPosition);
+		glDisable(GL_LIGHTING);
+		glutSolidSphere(1.9,12,12);  //Draw Sun (radio,H,V);
+		glEnable(GL_LIGHTING);
 	glPopMatrix();
 
 	glPushMatrix(); //Merecurio	
 	//inclinación de la orbita en 0°
 	glRotatef(mercurio, 0.0, 1.0, 0.0);	//hace que gire el planeta al rededor del sol (translación)
 	glTranslatef(2.5,0.0,0.0);			//distancia del planeta del sol
-	glColor3f(0.5,0.5,0.5);				//Color del planeta
 	glPushMatrix();						
-	glRotatef(mercurio, 0.0, 1.0, 0.0);	//hace que gira sobre su propio eje (rotación)
-	glutWireSphere(0.15,12,12);			//dibuja el planeta
+	glRotatef(mercurio, 0.0, 1.0, 0.0);	//hace que gira sobre su propio eje (rotación)		
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,MercuDiffuse);
+	glMaterialfv(GL_FRONT,GL_SPECULAR,MercuSpecular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,MercuShininess);
+	glutSolidSphere(0.15,12,12);			//dibuja el planeta
 	glPopMatrix();
 	glPopMatrix();
 
@@ -99,11 +140,13 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glPushMatrix(); //Venus	
 	glRotatef(22.5, 0.0, 0.0, 1.0);		//inclinación de la orbita
 	glRotatef(venus, 0.0, 1.0, 0.0);	
-	glTranslatef(3.5,0.0,0.0);			
-	glColor3f(0.9,0.5,0.0);
+	glTranslatef(3.5,0.0,0.0);	
 	glPushMatrix();
 	glRotatef(venus,0.0,1.0,0.0);
-	glutWireSphere(0.20,12,12);
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,VenusDiffuse);
+	glMaterialfv(GL_FRONT,GL_SPECULAR,VenusSpecular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,VenusShininess);
+	glutSolidSphere(0.20,12,12);
 	glPopMatrix();
 	glPopMatrix();
 
@@ -111,17 +154,21 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glRotatef(45.0, 0.0, 0.0, 1.0);
 	glRotatef(tierra, 0.0, 1.0, 0.0);
 	glTranslatef(4.5,0.0,0.0);	
-	glColor3f(0.1,0.6,0.9);
 	glPushMatrix();
 	glRotatef(tierra,0.0,1.0,0.0);
-	glutWireSphere(0.20,12,12);
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,EarthDiffuse);
+	glMaterialfv(GL_FRONT,GL_SPECULAR,EarthSpecular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,EarthShininess);
+	glutSolidSphere(0.20,12,12);
 	glPopMatrix();
 		glPushMatrix();//Luna	
 			glRotatef(luna,0.0,0.0,1.0);	
-			glTranslatef(0.4,0.0,0.0);			
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(0.4,0.0,0.0);	
 			glRotatef(luna+2,0.0,0.0,1.0);	
-			glutWireSphere(0.1,12,12);
+			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
+			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
+			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
+			glutSolidSphere(0.1,12,12);
 		glPopMatrix();
 	glPopMatrix();
 
@@ -129,17 +176,21 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glRotatef(67.5, 0.0, 0.0, 1.0);
 	glRotatef(marte, 0.0, 1.0, 0.0);
 	glTranslatef(5.5,0.0,0.0);	
-	glColor3f(0.9,0.75,0.4);
 	glPushMatrix();
-	glRotatef(marte,0.0,1.0,0.0);	
-	glutWireSphere(0.18,12,12);
+	glRotatef(marte,0.0,1.0,0.0);
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,MarsDiffuse);
+	glMaterialfv(GL_FRONT,GL_SPECULAR,MarsSpecular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,MarsShininess);
+	glutSolidSphere(0.18,12,12);
 	glPopMatrix();
 		glPushMatrix();//Luna
 			glRotatef(lunaM,0.0,1.0,1.0);	
-			glTranslatef(0.4,0.0,0.0);			
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(0.4,0.0,0.0);	
 			glRotatef(lunaM,0.0,0.0,1.0);	
-			glutWireSphere(0.1,12,12);
+			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
+			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
+			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
+			glutSolidSphere(0.1,12,12);
 		glPopMatrix();
 	glPopMatrix();
 
@@ -147,25 +198,31 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glRotatef(90.0, 0.0, 0.0, 1.0);
 	glRotatef(jupiter, 0.0, 1.0, 0.0);
 	glTranslatef(8.0,0.0,0.0);	
-	glColor3f(0.9,0.0,0.0);
 	glPushMatrix();
 	glRotatef(jupiter,0.0,1.0,0.0);	
-	glutWireSphere(0.5,12,12);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, ZeusDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, ZeusSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, ZeusShininess);
+	glutSolidSphere(0.5,12,12);
 	glPopMatrix();
 		glPushMatrix();//Luna
 			glRotatef(lunaJ1,0.0,1.0,0.0);	
-			glTranslatef(0.7,0.0,0.0);			
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(0.7,0.0,0.0);	
 			glRotatef(lunaJ1,0.0,0.0,1.0);	
-			glutWireSphere(0.1,12,12);
+			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
+			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
+			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
+			glutSolidSphere(0.1,12,12);
 		glPopMatrix();
 
 		glPushMatrix();//Luna
 			glRotatef(lunaJ2,0.0,0.0,1.0);
-			glTranslatef(1.2,0.0,0.0);			
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(1.2,0.0,0.0);	
 			glRotatef(lunaJ2,0.0,0.0,1.0);	
-			glutWireSphere(0.1,12,12);
+			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
+			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
+			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
+			glutSolidSphere(0.1,12,12);
 		glPopMatrix();
 	glPopMatrix();
 
@@ -173,41 +230,51 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glRotatef(112.5, 0.0, 0.0, 1.0);
 	glRotatef(saturno, 0.0, 1.0, 0.0);
 	glTranslatef(12.5,0.0,0.0);
-	glColor3f(0.7,0.7,0.1);
 	glPushMatrix();
 	glRotatef(saturno,0.0,1.0,0.0);
-	glutWireSphere(0.45,12,12);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, SaturnoDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, SaturnoSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, SaturnoShininess);
+	glutSolidSphere(0.45,12,12);
 	glPopMatrix();
 		glPushMatrix();//anillo
 			glRotatef(90.0,1.0,0.0,0.0);	
-			glTranslatef(0.0,0.0,0.0);				
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(0.0,0.0,0.0);	
 			glRotatef(anillo1,0.0,0.0,1.0);	
-			glutWireTorus(0.07,0.65,12,12);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, Anillo1Diffuse);
+			glMaterialfv(GL_FRONT, GL_SPECULAR, Anillo1Specular);
+			glMaterialfv(GL_FRONT, GL_SHININESS, Anillo1Shininess);
+			glutSolidTorus(0.07,0.65,12,12);
 		glPopMatrix();
 
 		glPushMatrix();//anillo
 			glRotatef(90.0,1.0,0.0,0.0);	
-			glTranslatef(0.0,0.0,0.0);				
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(0.0,0.0,0.0);	
 			glRotatef(anillo2,0.0,0.0,1.0);	
-			glutWireTorus(0.07,0.9,12,12);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, Anillo2Diffuse);
+			glMaterialfv(GL_FRONT, GL_SPECULAR, Anillo2Specular);
+			glMaterialfv(GL_FRONT, GL_SHININESS, Anillo2Shininess);
+			glutSolidTorus(0.07,0.9,12,12);
 		glPopMatrix();
 
 		glPushMatrix();//luna
 			glRotatef(lunaS1,0.0,1.0,1.0);	
-			glTranslatef(1.2,0.0,0.0);				
-			glColor3f(0.4,0.4,0.4);
+			glTranslatef(1.2,0.0,0.0);		
 			glRotatef(lunaS1,0.0,0.0,1.0);	
-			glutWireSphere(0.07,12,12);
+			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
+			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
+			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
+			glutSolidSphere(0.07,12,12);
 		glPopMatrix();
 
 		glPushMatrix();//luna
 			glRotatef(lunaS2,0.0,0.0,1.0);	
 			glTranslatef(1.6,0.0,0.0);	
-			glColor3f(0.4,0.4,0.4);
 			glRotatef(lunaS2,0.0,0.0,1.0);	
-			glutWireSphere(0.07,12,12);
+			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
+			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
+			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
+			glutSolidSphere(0.07,12,12);
 		glPopMatrix();
 
 	glPopMatrix();
@@ -216,21 +283,25 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glRotatef(135.5, 0.0, 0.0, 1.0);
 	glRotatef(urano, 0.0, 1.0, 0.0);
 	glTranslatef(17.0,0.0,0.0);
-	glColor3f(0.3,0.3,0.9);
 	glPushMatrix();
 	glRotatef(urano, 0.0, 1.0, 0.0);
-	glutWireSphere(0.38,12,12);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, UranoDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, UranoSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, UranoShininess);
+	glutSolidSphere(0.38,12,12);
 	glPopMatrix();
 	glPopMatrix();
 
 	glPushMatrix(); //Nepturno
 	glRotatef(157.5, 0.0, 0.0, 1.0);
 	glRotatef(nepturno, 0.0, 1.0, 0.0);
-	glTranslatef(19.5,0.0,0.0);		
-	glColor3f(0.5,0.75,1.0);
+	glTranslatef(19.5,0.0,0.0);	
 	glPushMatrix();
 	glRotatef(nepturno, 0.0, 1.0, 0.0);
-	glutWireSphere(0.41,12,12);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, NeptunoDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, NeptunoSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, NeptunoShininess);
+	glutSolidSphere(0.41,12,12);
 	glPopMatrix();
 	glPopMatrix();
 
@@ -360,7 +431,7 @@ int main ( int argc, char** argv )   // Main Function
   glutInitDisplayMode (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
   glutInitWindowSize  (500, 500);	// Tamaño de la Ventana
   glutInitWindowPosition (20, 60);	//Posicion de la Ventana
-  glutCreateWindow    ("Practica 6"); // Nombre de la Ventana
+  glutCreateWindow    ("Practica 7"); // Nombre de la Ventana
   InitGL ();						// Parametros iniciales de la aplicacion
   glutDisplayFunc     ( display );  //Indicamos a Glut función de dibujo
   glutReshapeFunc     ( reshape );	//Indicamos a Glut función en caso de cambio de tamano
