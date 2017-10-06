@@ -1,12 +1,11 @@
-//Semestre 2018 - 1
+//Semestre 2012 - 1
 //************************************************************//
 //************************************************************//
-//************** Alumno (s): Gonz谩lez Col铆n Fernando	******//
-//*************	Ejercicio pr谩ctica 7					******//
+//************** Alumno (s): Gonz醠ez Col韓 Fernando    ******//
+//*************	Ejercicio pr醕tica 8					******//
 //*************											******//
 //************************************************************//
-#include "Main.h"
-
+#include "texture.h"
 
 // Variables used to calculate frames per second: (Windows)
 DWORD dwFrames = 0;
@@ -14,332 +13,291 @@ DWORD dwCurrentTime = 0;
 DWORD dwLastUpdateTime = 0;
 DWORD dwElapsedTime = 0;
 
+float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
+int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
 
-//Variables used to create movement
 
-int sol=0;
-int mercurio=0;
-int venus=0;
-int tierra=0;
-int luna=0;
-int marte=0;
-int lunaM = 0;
-int jupiter=0;
-int lunaJ1 = 0;
-int lunaJ2 = 0;
-int saturno= 0;
-int anillo1 = 0;
-int anillo2 = 0;
-int lunaS1 = 0;
-int lunaS2 = 0;
-int urano=0;
-int nepturno=0;
+GLfloat Diffuse[]= { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
+GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
+GLfloat Position[]= { 0.0f, 3.0f, 0.0f, 1.0f };			// Light Position
+GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
 
-float camaraZ = 0.0;
-float camaraX = 0.0;
 
-float angX = 0.0;
-float angY = 0.0;
+CTexture t_pasto;
+CTexture t_madera;
+CTexture t_techo;
+CTexture t_adoquin;
+CTexture t_madera_2;
+CTexture t_puerta;
+CTexture t_seto;
+CTexture t_ventana;
 
-GLfloat SunDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };			// Diffuse Light Values
-GLfloat SunSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
-GLfloat SunPosition[]= { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
 
-GLfloat MercuDiffuse[]= { 0.35,0.35,0.35, 1.0f };			// Mercurio
-GLfloat MercuSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
-GLfloat MercuShininess[] = { 100.0 };
 
-GLfloat VenusDiffuse[]= { 0.7,0.3,0.0, 1.0f };			// Venus
-GLfloat VenusSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
-GLfloat VenusShininess[] = { 100.0 };
+int font=(int)GLUT_BITMAP_TIMES_ROMAN_24;
 
-GLfloat EarthDiffuse[]= { 0.0f, 0.87f, 1.0f, 1.0f };			// Tierra
-GLfloat EarthSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
-GLfloat EarthShininess[] = { 100.0 };
 
-GLfloat MoonDiffuse[]= { 0.8f, 0.8f, 0.8f, 1.0f };			// LunaTierra
-GLfloat MoonSpecular[] = { 1.0, 1.0, 1.0, 1.0 };
-GLfloat MoonShininess[] = { 100.0 };
-
-GLfloat MarsDiffuse[]= { 1.0f, 0.4f, 0.1f, 1.0f };			// Marte
-GLfloat MarsSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat MarsShininess[] = {100.0 };
-
-GLfloat ZeusDiffuse[]= { 1.0f, 0.0f, 0.0f, 1.0f };			// jupiter
-GLfloat ZeusSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat ZeusShininess[] = {100.0 };
-
-GLfloat SaturnoDiffuse[]= { 1.0f, 0.4f, 0.1f, 1.0f };			// Saturno
-GLfloat SaturnoSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat SaturnoShininess[] = {100.0 };
-
-GLfloat Anillo1Diffuse[] = {0.96, 0.84, 0.77, 1.0f };			// Anillo1
-GLfloat Anillo1Specular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat Anillo1Shininess[] = { 100.0 };
-
-GLfloat Anillo2Diffuse[] = { 0.77, 0.94, 0.96, 1.0f };			// Anillo2
-GLfloat Anillo2Specular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat Anillo2Shininess[] = { 100.0 };
-
-GLfloat UranoDiffuse[] = { 0.3,0.3,0.9, 1.0f };			// Urano
-GLfloat UranoSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat UranoShininess[] = { 100.0 };
-
-GLfloat NeptunoDiffuse[] = { 0.5,0.75,1.0, 1.0f };			// Neptuno
-GLfloat NeptunoSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat NeptunoShininess[] = { 100.0 };
 
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Azul de fondo	
+
+	glEnable(GL_TEXTURE_2D);
+
+	//glShadeModel (GL_SMOOTH);
+	glLightfv(GL_LIGHT0, GL_POSITION, Position);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
+	
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
 	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	
-	//Para emplear luces
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, SunDiffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, SunSpecular);
+
+	t_pasto.LoadTGA("pasto.tga");
+	t_pasto.BuildGLTexture();
+	t_pasto.ReleaseImage();
+
+	t_madera.LoadTGA("madera.tga");
+	t_madera.BuildGLTexture();
+	t_madera.ReleaseImage();
+
+	t_techo.LoadTGA("techo.tga");
+	t_techo.BuildGLTexture();
+	t_techo.ReleaseImage();
+
+	t_adoquin.LoadTGA("adoquin.tga");
+	t_adoquin.BuildGLTexture();
+	t_adoquin.ReleaseImage();
+
+	t_madera_2.LoadTGA("madera_2.tga");
+	t_madera_2.BuildGLTexture();
+	t_madera_2.ReleaseImage();
+
+	t_puerta.LoadTGA("puerta.tga");
+	t_puerta.BuildGLTexture();
+	t_puerta.ReleaseImage();
+
+	t_seto.LoadTGA("seto.tga");
+	t_seto.BuildGLTexture();
+	t_seto.ReleaseImage();
+
+	t_ventana.LoadTGA("ventana.tga");
+	t_ventana.BuildGLTexture();
+	t_ventana.ReleaseImage();
+
 }
+
+
+void renderBitmapCharacter(float x, float y, float z, void *font,char *string)
+{
+  
+  char *c;     //Almacena los caracteres a escribir
+  glRasterPos3f(x, y, z);	//Posicion apartir del centro de la ventana
+  //glWindowPos2i(150,100);
+  for (c=string; *c != '\0'; c++) //Condicion de fin de cadena
+  {
+    glutBitmapCharacter(font, *c); //imprime
+  }
+}
+
+
+
+void prisma (GLuint textura1, GLuint textura2)  //Funcion creacion prisma
+{
+
+	GLfloat vertice [12][3] = {
+				{0.5 ,-0.5, 0.5},    //Coordenadas V閞tice 0 V0
+				{-0.5 ,-0.5, 0.5},    //Coordenadas V閞tice 1 V1
+				{-0.5 ,-0.5, -0.5},    //Coordenadas V閞tice 2 V2
+				{0.5 ,-0.5, -0.5},    //Coordenadas V閞tice 3 V3
+				{0.5 ,0.5, 0.5},    //Coordenadas V閞tice 4 V4
+				{0.5 ,0.5, -0.5},    //Coordenadas V閞tice 5 V5
+				{-0.5 ,0.5, -0.5},    //Coordenadas V閞tice 6 V6
+				{-0.5 ,0.5, 0.5},    //Coordenadas V閞tice 7 V7
+				};
+
+		
+		glBindTexture(GL_TEXTURE_2D, textura2);   // choose the texture to use.
+		glBegin(GL_POLYGON);	//Front
+			glColor3f(1.0,1.0,1.0);
+			glNormal3f( 0.0f, 0.0f, 1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[1]);
+			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[0]);
+			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[4]);
+			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[7]);
+		glEnd();
+	
+		glBegin(GL_POLYGON);	//Right
+			glNormal3f( 1.0f, 0.0f, 0.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);
+			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[3]);
+			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[5]);
+			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[4]);
+		glEnd();
+
+		glBegin(GL_POLYGON);	//Back
+			glNormal3f( 0.0f, 0.0f,-1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[3]);
+			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[2]);
+			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[6]);
+			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[5]);
+		glEnd();
+
+		glBegin(GL_POLYGON);  //Left
+			glNormal3f(-1.0f, 0.0f, 0.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[1]);
+			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[2]);
+			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[6]);
+			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[7]);
+		glEnd();
+
+		glBegin(GL_POLYGON);  //Bottom
+			glNormal3f( 0.0f,-1.0f, 0.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);
+			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[1]);
+			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[2]);
+			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[3]);
+		glEnd();
+
+		glBindTexture(GL_TEXTURE_2D, textura1);   // choose the texture to use.
+		glBegin(GL_POLYGON);  //Top0
+			glNormal3f( 0.0f, 1.0f, 0.0f);
+			glTexCoord2f(4.0, 0.0f); glVertex3fv(vertice[4]);
+			glTexCoord2f(4.0, 4.0f); glVertex3fv(vertice[5]);
+			glTexCoord2f(0.0, 4.0f); glVertex3fv(vertice[6]);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[7]);
+		glEnd();
+}
+
 
 void display ( void )   // Creamos la funcion donde se dibuja
 {
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	glLoadIdentity();
 
-	glTranslatef(camaraX,0.0,-5.0+camaraZ);			//camara
-	glRotatef(angX, 1.0, 0.0, 0.0);					//Para cambiar "angulo de vista"
-	glRotatef(angY, 0.0, 0.0, 1.0);	
-		
-	glPushMatrix();
-		glRotatef(sol,0.0,1.0,0.0);	//El Sol gira sobre su eje	
-		glColor3f( 0.9,0.9,0.3);	//Sol amarillo
-		glLightfv(GL_LIGHT1,GL_POSITION,SunPosition);
-		glDisable(GL_LIGHTING);
-		glutSolidSphere(1.9,12,12);  //Draw Sun (radio,H,V);
-		glEnable(GL_LIGHTING);
+	glTranslatef(pos_camX, pos_camY, pos_camZ);
+	glRotatef(eye_camX, 1.0, 0.0, 0.0);
+	glRotatef(eye_camY, 0.0, 1.0, 0.0);
+	glRotatef(eye_camZ, 0.0, 0.0, 1.0);
+
+	glPushMatrix();		//suelo-pasto
+	glTranslatef(0.0, 0.0, 0.0);
+	glScalef(7.5,0.1,7.5);
+	prisma(t_pasto.GLindex, t_pasto.GLindex);
 	glPopMatrix();
 
-	glPushMatrix(); //Merecurio	
-	//inclinaci贸n de la orbita en 0掳
-	glRotatef(mercurio, 0.0, 1.0, 0.0);	//hace que gire el planeta al rededor del sol (translaci贸n)
-	glTranslatef(2.5,0.0,0.0);			//distancia del planeta del sol
-	glPushMatrix();						
-	glRotatef(mercurio, 0.0, 1.0, 0.0);	//hace que gira sobre su propio eje (rotaci贸n)		
-	glMaterialfv(GL_FRONT,GL_DIFFUSE,MercuDiffuse);
-	glMaterialfv(GL_FRONT,GL_SPECULAR,MercuSpecular);
-	glMaterialfv(GL_FRONT,GL_SHININESS,MercuShininess);
-	glutSolidSphere(0.15,12,12);			//dibuja el planeta
+	glPushMatrix();		//paredes
+	glTranslatef(0.0,1.76,-1.0);
+	glScalef(3.5, 3.5, 4.0);
+	prisma(t_madera.GLindex, t_madera.GLindex);
 	glPopMatrix();
+
+	glPushMatrix();		//techo
+	glTranslatef(0.0, 3.51, -1.0);
+	glScalef(4.0, 0.1, 4.5);
+	prisma(t_techo.GLindex, t_techo.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//tejado
+	glTranslatef(0.0, 2.0, 2.0);
+	glRotatef(18.0, 1.0, 0.0, 0.0);
+	glScalef(3.5, 0.1, 2.0);	
+	prisma(t_techo.GLindex, t_techo.GLindex);
+	glPopMatrix();
+	
+	glPushMatrix();		//suelo-adoquin
+	glTranslatef(0.0, 0.05, 2.25);
+	glScalef(1.0, 0.01, 3.0);
+	prisma(t_adoquin.GLindex, t_adoquin.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//poste-izq
+	glTranslatef(-1.5, 0.9, 2.75);
+	glScalef(0.15, 1.8, 0.15);
+	prisma(t_madera_2.GLindex, t_madera_2.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//poste-der
+	glTranslatef(1.5, 0.9, 2.75);
+	glScalef(0.13, 1.8, 0.13);
+	prisma(t_madera_2.GLindex, t_madera_2.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//puerta
+	glTranslatef(0.0, 0.9, 1.0);
+	glScalef(1.0, 1.8, 0.09);
+	prisma(t_madera.GLindex, t_puerta.GLindex);
+	glPopMatrix();
+
+	//Setos
+	glPushMatrix();		//trasero
+	glTranslatef(0.0, 0.5, -3.20);
+	glScalef(4.3, 1.0, 0.4);
+	prisma(t_seto.GLindex, t_seto.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//izquierdo
+	glTranslatef(-1.95, 0.5, -1.0);
+	glScalef(0.4, 1.0, 4.0);
+	prisma(t_seto.GLindex, t_seto.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//derecho
+	glTranslatef(1.95, 0.5, -1.0);
+	glScalef(0.4, 1.0, 4.0);
+	prisma(t_seto.GLindex, t_seto.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//frontal izquierdo
+	glTranslatef(-1.325, 0.5, 1.15);
+	glScalef(1.65, 1.0, 0.4);
+	prisma(t_seto.GLindex, t_seto.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//frontal derecho
+	glTranslatef(1.325, 0.5, 1.15);
+	glScalef(1.65, 1.0, 0.4);
+	prisma(t_seto.GLindex, t_seto.GLindex);
+	glPopMatrix();
+
+	//Ventanas
+	glPushMatrix();		//frontal 
+	glTranslatef(0.0, 3.0, 1.0);
+	glScalef(2.5, 0.75, 0.01);
+	prisma(t_madera.GLindex, t_ventana.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//izquierda
+	glTranslatef(-1.76, 2.25, -1.0);
+	glScalef(0.01, 2.0, 2.5);
+	prisma(t_madera.GLindex, t_ventana.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();		//derecha
+	glTranslatef(1.76, 2.25, -1.0);
+	glScalef(0.01, 2.0, 2.5);
+	prisma(t_madera.GLindex, t_ventana.GLindex);
 	glPopMatrix();
 
 
-	glPushMatrix(); //Venus	
-	glRotatef(22.5, 0.0, 0.0, 1.0);		//inclinaci贸n de la orbita
-	glRotatef(venus, 0.0, 1.0, 0.0);	
-	glTranslatef(3.5,0.0,0.0);	
-	glPushMatrix();
-	glRotatef(venus,0.0,1.0,0.0);
-	glMaterialfv(GL_FRONT,GL_DIFFUSE,VenusDiffuse);
-	glMaterialfv(GL_FRONT,GL_SPECULAR,VenusSpecular);
-	glMaterialfv(GL_FRONT,GL_SHININESS,VenusShininess);
-	glutSolidSphere(0.20,12,12);
-	glPopMatrix();
-	glPopMatrix();
+	/*glDisable(GL_TEXTURE_2D);
+		renderBitmapCharacter(-11, 12.0, -14.0, (void *)font, "Practica 8");
+		renderBitmapCharacter(-11, 10.5, -14, (void *)font, "Texturas");
+	glEnable(GL_TEXTURE_2D);*/
 
-	glPushMatrix(); //Tierra
-	glRotatef(45.0, 0.0, 0.0, 1.0);
-	glRotatef(tierra, 0.0, 1.0, 0.0);
-	glTranslatef(4.5,0.0,0.0);	
-	glPushMatrix();
-	glRotatef(tierra,0.0,1.0,0.0);
-	glMaterialfv(GL_FRONT,GL_DIFFUSE,EarthDiffuse);
-	glMaterialfv(GL_FRONT,GL_SPECULAR,EarthSpecular);
-	glMaterialfv(GL_FRONT,GL_SHININESS,EarthShininess);
-	glutSolidSphere(0.20,12,12);
-	glPopMatrix();
-		glPushMatrix();//Luna	
-			glRotatef(luna,0.0,0.0,1.0);	
-			glTranslatef(0.4,0.0,0.0);	
-			glRotatef(luna+2,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
-			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
-			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
-			glutSolidSphere(0.1,12,12);
-		glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix(); //Marte
-	glRotatef(67.5, 0.0, 0.0, 1.0);
-	glRotatef(marte, 0.0, 1.0, 0.0);
-	glTranslatef(5.5,0.0,0.0);	
-	glPushMatrix();
-	glRotatef(marte,0.0,1.0,0.0);
-	glMaterialfv(GL_FRONT,GL_DIFFUSE,MarsDiffuse);
-	glMaterialfv(GL_FRONT,GL_SPECULAR,MarsSpecular);
-	glMaterialfv(GL_FRONT,GL_SHININESS,MarsShininess);
-	glutSolidSphere(0.18,12,12);
-	glPopMatrix();
-		glPushMatrix();//Luna
-			glRotatef(lunaM,0.0,1.0,1.0);	
-			glTranslatef(0.4,0.0,0.0);	
-			glRotatef(lunaM,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
-			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
-			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
-			glutSolidSphere(0.1,12,12);
-		glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix(); //Jupiter
-	glRotatef(90.0, 0.0, 0.0, 1.0);
-	glRotatef(jupiter, 0.0, 1.0, 0.0);
-	glTranslatef(8.0,0.0,0.0);	
-	glPushMatrix();
-	glRotatef(jupiter,0.0,1.0,0.0);	
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, ZeusDiffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, ZeusSpecular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, ZeusShininess);
-	glutSolidSphere(0.5,12,12);
-	glPopMatrix();
-		glPushMatrix();//Luna
-			glRotatef(lunaJ1,0.0,1.0,0.0);	
-			glTranslatef(0.7,0.0,0.0);	
-			glRotatef(lunaJ1,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
-			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
-			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
-			glutSolidSphere(0.1,12,12);
-		glPopMatrix();
-
-		glPushMatrix();//Luna
-			glRotatef(lunaJ2,0.0,0.0,1.0);
-			glTranslatef(1.2,0.0,0.0);	
-			glRotatef(lunaJ2,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
-			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
-			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
-			glutSolidSphere(0.1,12,12);
-		glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix(); //Saturno
-	glRotatef(112.5, 0.0, 0.0, 1.0);
-	glRotatef(saturno, 0.0, 1.0, 0.0);
-	glTranslatef(12.5,0.0,0.0);
-	glPushMatrix();
-	glRotatef(saturno,0.0,1.0,0.0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, SaturnoDiffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, SaturnoSpecular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, SaturnoShininess);
-	glutSolidSphere(0.45,12,12);
-	glPopMatrix();
-		glPushMatrix();//anillo
-			glRotatef(90.0,1.0,0.0,0.0);	
-			glTranslatef(0.0,0.0,0.0);	
-			glRotatef(anillo1,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, Anillo1Diffuse);
-			glMaterialfv(GL_FRONT, GL_SPECULAR, Anillo1Specular);
-			glMaterialfv(GL_FRONT, GL_SHININESS, Anillo1Shininess);
-			glutSolidTorus(0.07,0.65,12,12);
-		glPopMatrix();
-
-		glPushMatrix();//anillo
-			glRotatef(90.0,1.0,0.0,0.0);	
-			glTranslatef(0.0,0.0,0.0);	
-			glRotatef(anillo2,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, Anillo2Diffuse);
-			glMaterialfv(GL_FRONT, GL_SPECULAR, Anillo2Specular);
-			glMaterialfv(GL_FRONT, GL_SHININESS, Anillo2Shininess);
-			glutSolidTorus(0.07,0.9,12,12);
-		glPopMatrix();
-
-		glPushMatrix();//luna
-			glRotatef(lunaS1,0.0,1.0,1.0);	
-			glTranslatef(1.2,0.0,0.0);		
-			glRotatef(lunaS1,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
-			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
-			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
-			glutSolidSphere(0.07,12,12);
-		glPopMatrix();
-
-		glPushMatrix();//luna
-			glRotatef(lunaS2,0.0,0.0,1.0);	
-			glTranslatef(1.6,0.0,0.0);	
-			glRotatef(lunaS2,0.0,0.0,1.0);	
-			glMaterialfv(GL_FRONT,GL_DIFFUSE,MoonDiffuse);
-			glMaterialfv(GL_FRONT,GL_SPECULAR,MoonSpecular);
-			glMaterialfv(GL_FRONT,GL_SHININESS,MoonShininess);
-			glutSolidSphere(0.07,12,12);
-		glPopMatrix();
-
-	glPopMatrix();
-
-	glPushMatrix(); //Urano
-	glRotatef(135.5, 0.0, 0.0, 1.0);
-	glRotatef(urano, 0.0, 1.0, 0.0);
-	glTranslatef(17.0,0.0,0.0);
-	glPushMatrix();
-	glRotatef(urano, 0.0, 1.0, 0.0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, UranoDiffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, UranoSpecular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, UranoShininess);
-	glutSolidSphere(0.38,12,12);
-	glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix(); //Nepturno
-	glRotatef(157.5, 0.0, 0.0, 1.0);
-	glRotatef(nepturno, 0.0, 1.0, 0.0);
-	glTranslatef(19.5,0.0,0.0);	
-	glPushMatrix();
-	glRotatef(nepturno, 0.0, 1.0, 0.0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, NeptunoDiffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, NeptunoSpecular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, NeptunoShininess);
-	glutSolidSphere(0.41,12,12);
-	glPopMatrix();
-	glPopMatrix();
 
 	glutSwapBuffers ( );
-
 }
 
-void animacion()
-{
-	// Calculate the number of frames per one second:
-	//dwFrames++;
+void animacion() {
 	dwCurrentTime = GetTickCount(); // Even better to use timeGetTime()
 	dwElapsedTime = dwCurrentTime - dwLastUpdateTime;
-
-	if(dwElapsedTime >= 30)
-	{
-		sol = (sol - 2) % 360;
-		mercurio = (mercurio - 5)%360;
-		venus = (venus - 4)%360;
-		tierra = (tierra + 4)%360;
-		luna = (luna + 2)%360;
-		marte = (marte - 3)%360;
-		jupiter = (jupiter - 2)%360;
-		saturno = (saturno + 2)%360;
-		urano = (urano + 1)%360;
-		nepturno = (nepturno - 1)%360;
-
-		lunaM = (lunaM + 4)%360;
-		lunaJ1 = (lunaJ1 + 4)%360;
-		lunaJ2 = (lunaJ2 + 5)%360;
-		anillo1 = (anillo1 + 5)%360;
-		anillo2 = (anillo2 - 5)%360;
-		lunaS1 = (lunaS1 + 5)%360;
-		lunaS2 = (lunaS2 - 6)%360;
-
+	if (dwElapsedTime >= 30) {
+		eye_camY = (eye_camY + 2)%360;
 		dwLastUpdateTime = dwCurrentTime;
 	}
-
 	glutPostRedisplay();
 }
 
@@ -360,39 +318,50 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 50.0);
 
 	glMatrixMode(GL_MODELVIEW);							// Seleccionamos Modelview Matrix
-	//glLoadIdentity();
+	glLoadIdentity();
 }
+
 
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 		case 'W':
-			camaraZ +=0.5f;
+			pos_camZ += 0.5f;
+			//eye_camZ -= 0.5f;
 			break;
+
 		case 's':
 		case 'S':
-			camaraZ -=0.5f;
+			pos_camZ -= 0.5f;
+			//eye_camZ += 0.5f;
 			break;
+
 		case 'a':
 		case 'A':
-			camaraX -= 0.5f;
+			pos_camX += 0.5f;
+			//eye_camX -= 0.5f;
 			break;
 		case 'd':
 		case 'D':
-			camaraX += 0.5f;
+			pos_camX -= 0.5f;
+			//eye_camX += 0.5f;
 			break;
-
-		case 'i':		//Movimientos de Luz
-		case 'I':			
+		case 'q':
+		case 'Q':
+			pos_camY += 0.5f;
 			break;
-
+		case 'e':
+		case 'E':
+			pos_camY -= 0.5f;
+			break;
+		case 'i':
+		case 'I':
+			eye_camZ = (eye_camZ+15) % 360;
+			break;
 		case 'k':
-		case 'K':			
-			break;
-
-		case 'l':   //Activamos/desactivamos luz
-		case 'L':
+		case 'K':
+			eye_camZ = (eye_camZ-15) % 360;
 			break;
 		case 27:        // Cuando Esc es presionado...
 			exit ( 0 );   // Salimos del programa
@@ -406,17 +375,30 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas especiales (arrow keys)
 {
   switch ( a_keys ) {
+	case GLUT_KEY_PAGE_UP:
+		pos_camY -= 0.5f;
+		//eye_camY += 0.5f;
+		break;
+
+	case GLUT_KEY_PAGE_DOWN:
+		pos_camY += 0.5f;
+		//eye_camY -= 0.5f;
+		break;
+
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
-		angX+=5.0;
+		eye_camX = (eye_camX-15) % 360;
 		break;
+
     case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
-		angX-=5.0;
+		eye_camX = (eye_camX+15) % 360;
 		break;
+
 	case GLUT_KEY_LEFT:
-		angY+=5.0;
+		eye_camY = (eye_camY-15) % 360;
 		break;
+
 	case GLUT_KEY_RIGHT:
-		angY-=5.0;
+		eye_camY = (eye_camY+15) % 360;
 		break;
     default:
       break;
@@ -429,13 +411,14 @@ int main ( int argc, char** argv )   // Main Function
 {
   glutInit            (&argc, argv); // Inicializamos OpenGL
   glutInitDisplayMode (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
-  glutInitWindowSize  (500, 500);	// Tama帽o de la Ventana
-  glutInitWindowPosition (20, 60);	//Posicion de la Ventana
-  glutCreateWindow    ("Practica 7"); // Nombre de la Ventana
+  glutInitWindowSize  (1000, 800);	// Tama駉 de la Ventana
+  glutInitWindowPosition (0, 0);	//Posicion de la Ventana
+  glutCreateWindow    ("Practica 8"); // Nombre de la Ventana
+  //glutFullScreen     ( );         // Full Screen
   InitGL ();						// Parametros iniciales de la aplicacion
-  glutDisplayFunc     ( display );  //Indicamos a Glut funci贸n de dibujo
-  glutReshapeFunc     ( reshape );	//Indicamos a Glut funci贸n en caso de cambio de tamano
-  glutKeyboardFunc    ( keyboard );	//Indicamos a Glut funci贸n de manejo de teclado
+  glutDisplayFunc     ( display );  //Indicamos a Glut funci髇 de dibujo
+  glutReshapeFunc     ( reshape );	//Indicamos a Glut funci髇 en caso de cambio de tamano
+  glutKeyboardFunc    ( keyboard );	//Indicamos a Glut funci髇 de manejo de teclado
   glutSpecialFunc     ( arrow_keys );	//Otras
   glutIdleFunc		  ( animacion );
   glutMainLoop        ( );          // 
