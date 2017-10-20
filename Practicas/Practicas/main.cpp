@@ -2,7 +2,7 @@
 //************************************************************//
 //************************************************************//
 //************** Alumno (s): González Colín Fernando    ******//
-//*************	Ejercicio práctica 8					******//
+//*************	Ejercicio práctica 9					******//
 //*************											******//
 //************************************************************//
 #include "texture.h"
@@ -188,11 +188,111 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	prisma(t_pasto.GLindex, t_pasto.GLindex);
 	glPopMatrix();
 
-	glPushMatrix();		//paredes
+	//paredes
+	/*glPushMatrix();		
 	glTranslatef(0.0,1.76,-1.0);
 	glScalef(3.5, 3.5, 4.0);
 	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();*/
+
+	glPushMatrix(); //front
+	glTranslatef(-1.125, 0.9, 1.0);
+	glScalef(1.25, 1.8, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
 	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.125, 0.9, 1.0);
+	glScalef(1.25, 1.8, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.0, 2.2125, 1.0);
+	glScalef(3.5, 0.825, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.0, 3.4375, 1.0);
+	glScalef(3.5, 0.125, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-1.5, 3.0, 1.0);
+	glScalef(0.5, 0.765, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.5, 3.0, 1.0);
+	glScalef(0.5, 0.765, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix(); //izq
+	glTranslatef(-1.75, 0.625, -1.0);
+	glScalef(0.09, 1.25, 4.0);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix(); 
+	glTranslatef(-1.75, 3.375, -1.0);
+	glScalef(0.09, 0.25, 4.0);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-1.75, 2.25, -2.625);
+	glScalef(0.09, 2.0, 0.75);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-1.75, 2.25, 0.625);
+	glScalef(0.09, 2.0, 0.75);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix(); //der
+	glTranslatef(1.75, 0.625, -1.0);
+	glScalef(0.09, 1.25, 4.0);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.75, 3.375, -1.0);
+	glScalef(0.09, 0.25, 4.0);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.75, 2.25, -2.625);
+	glScalef(0.09, 2.0, 0.75);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.75, 2.25, 0.625);
+	glScalef(0.09, 2.0, 0.75);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+
+	glPushMatrix(); //trasero
+	glTranslatef(0.0, 1.75, -3.0);
+	glScalef(3.5, 3.5, 0.09);
+	prisma(t_madera.GLindex, t_madera.GLindex);
+	glPopMatrix();
+	//fin paredes
+
+	//piso
+	glPushMatrix(); //trasero
+	glTranslatef(0.0, 0.1, -1.0);
+	glScalef(3.5, 0.09, 4.0);
+	prisma(t_madera_2.GLindex, t_madera_2.GLindex);
+	glPopMatrix();
+
 
 	glPushMatrix();		//techo
 	glTranslatef(0.0, 3.51, -1.0);
@@ -228,7 +328,10 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glPushMatrix();		//puerta
 	glTranslatef(0.0, 0.9, 1.0);
 	glScalef(1.0, 1.8, 0.09);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER,0.0);
 	prisma(t_madera.GLindex, t_puerta.GLindex);
+	glDisable(GL_ALPHA_TEST);
 	glPopMatrix();
 
 	//Setos
@@ -251,13 +354,13 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glPopMatrix();
 
 	glPushMatrix();		//frontal izquierdo
-	glTranslatef(-1.325, 0.5, 1.15);
+	glTranslatef(-1.325, 0.5, 1.20);
 	glScalef(1.65, 1.0, 0.4);
 	prisma(t_seto.GLindex, t_seto.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();		//frontal derecho
-	glTranslatef(1.325, 0.5, 1.15);
+	glTranslatef(1.325, 0.5, 1.20);
 	glScalef(1.65, 1.0, 0.4);
 	prisma(t_seto.GLindex, t_seto.GLindex);
 	glPopMatrix();
@@ -265,20 +368,29 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	//Ventanas
 	glPushMatrix();		//frontal 
 	glTranslatef(0.0, 3.0, 1.0);
-	glScalef(2.5, 0.75, 0.01);
+	glScalef(2.5, 0.75, 0.09);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0);
 	prisma(t_madera.GLindex, t_ventana.GLindex);
+	glDisable(GL_ALPHA_TEST);
 	glPopMatrix();
 
 	glPushMatrix();		//izquierda
-	glTranslatef(-1.76, 2.25, -1.0);
-	glScalef(0.01, 2.0, 2.5);
+	glTranslatef(-1.75, 2.25, -1.0);
+	glScalef(0.09, 2.0, 2.5);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0);
 	prisma(t_madera.GLindex, t_ventana.GLindex);
+	glDisable(GL_ALPHA_TEST);
 	glPopMatrix();
 
 	glPushMatrix();		//derecha
-	glTranslatef(1.76, 2.25, -1.0);
-	glScalef(0.01, 2.0, 2.5);
+	glTranslatef(1.75, 2.25, -1.0);
+	glScalef(0.09, 2.0, 2.5);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0);
 	prisma(t_madera.GLindex, t_ventana.GLindex);
+	glDisable(GL_ALPHA_TEST);
 	glPopMatrix();
 
 
