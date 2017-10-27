@@ -1,95 +1,125 @@
-//Semestre 2012 - 1
+//Semestre 2018 - 1
 //************************************************************//
 //************************************************************//
-//************** Alumno (s): González Colín Fernando    ******//
-//*************	Ejercicio práctica 9					******//
+//************** Alumno (s): González Colín Fernando   *******//
+//*************	Ejercicio Práctica 10					******//
 //*************											******//
 //************************************************************//
+//************************************************************//
+
 #include "texture.h"
+#include "figuras.h"
+#include "Camera.h"
 
-// Variables used to calculate frames per second: (Windows)
-DWORD dwFrames = 0;
-DWORD dwCurrentTime = 0;
-DWORD dwLastUpdateTime = 0;
-DWORD dwElapsedTime = 0;
+#include "cmodel/CModel.h"
 
-float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
-int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
+//Solo para Visual Studio 2015
+#if (_MSC_VER == 1900)
+#   pragma comment( lib, "legacy_stdio_definitions.lib" )
+#endif
 
+CCamera objCamera; 
+GLfloat g_lookupdown = 0.0f;    // Look Position In The Z-Axis (NEW) 
+
+int font=(int)GLUT_BITMAP_HELVETICA_18;
 
 GLfloat Diffuse[]= { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
 GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
-GLfloat Position[]= { 0.0f, 3.0f, 0.0f, 1.0f };			// Light Position
-GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
+GLfloat Position[]= { 0.0f, 27.0f, -5.0f, 0.0f };			// Light Position
+GLfloat Position2[]= { 0.0f, 0.0f, -5.0f, 1.0f };			// Light Position
 
+GLfloat m_dif1[] = { 0.0f, 0.2f, 1.0f, 1.0f };				// Diffuse Light Values
+GLfloat m_spec1[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
+GLfloat m_amb1[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
+GLfloat m_s1[] = {18};
 
-CTexture t_pasto;
-CTexture t_madera;
-CTexture t_techo;
-CTexture t_adoquin;
-CTexture t_madera_2;
-CTexture t_puerta;
-CTexture t_seto;
-CTexture t_ventana;
+CTexture text1;
+CTexture text2;
+CTexture text3;	//Flecha
+CTexture text4;	//Pavimento
+CTexture text5;	//Pasto01
+CTexture text6;	//Casa01
 
+CFiguras fig1;
+CFiguras fig2;
+CFiguras fig3;
+CFiguras fig4;	//Pasto01
+CFiguras fig5;	//Casa01
+CFiguras fig6;
 
+CFiguras fig7; //Para el monito
 
-int font=(int)GLUT_BITMAP_TIMES_ROMAN_24;
+//Figuras de 3D Studio
+CModel kit;
+CModel llanta;
 
-
-
+//Animación del coche
+float movKit = 0.0;
+int rotRocket = 0, i=0;
+bool g_fanimacion = false, rot_anim=false;
+float sentido=1.0;
+			
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Azul de fondo	
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
 
 	glEnable(GL_TEXTURE_2D);
 
-	//glShadeModel (GL_SMOOTH);
-	glLightfv(GL_LIGHT0, GL_POSITION, Position);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
-	
+	glShadeModel (GL_SMOOTH);
+	glLightfv(GL_LIGHT1, GL_POSITION, Position);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, Diffuse);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	glEnable ( GL_COLOR_MATERIAL );
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
 	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	t_pasto.LoadTGA("pasto.tga");
-	t_pasto.BuildGLTexture();
-	t_pasto.ReleaseImage();
+	glEnable(GL_AUTO_NORMAL);
+	glEnable(GL_NORMALIZE);
 
-	t_madera.LoadTGA("madera.tga");
-	t_madera.BuildGLTexture();
-	t_madera.ReleaseImage();
+	/* setup blending */
+	glEnable(GL_BLEND);			// Turn Blending On
+    
+    text1.LoadBMP("01.bmp");
+	text1.BuildGLTexture();
+	text1.ReleaseImage();
 
-	t_techo.LoadTGA("techo.tga");
-	t_techo.BuildGLTexture();
-	t_techo.ReleaseImage();
+	text2.LoadBMP("logopumas.bmp");
+	text2.BuildGLTexture();
+	text2.ReleaseImage();
 
-	t_adoquin.LoadTGA("adoquin.tga");
-	t_adoquin.BuildGLTexture();
-	t_adoquin.ReleaseImage();
+	text3.LoadTGA("city/arrow.tga");
+	text3.BuildGLTexture();
+	text3.ReleaseImage();
 
-	t_madera_2.LoadTGA("madera_2.tga");
-	t_madera_2.BuildGLTexture();
-	t_madera_2.ReleaseImage();
+	text4.LoadTGA("city/pavimento.tga");
+	text4.BuildGLTexture();
+	text4.ReleaseImage();
 
-	t_puerta.LoadTGA("puerta.tga");
-	t_puerta.BuildGLTexture();
-	t_puerta.ReleaseImage();
+	text5.LoadTGA("city/pasto01.tga");
+	text5.BuildGLTexture();
+	text5.ReleaseImage();
 
-	t_seto.LoadTGA("seto.tga");
-	t_seto.BuildGLTexture();
-	t_seto.ReleaseImage();
+	text6.LoadTGA("city/casa01.tga");
+	text6.BuildGLTexture();
+	text6.ReleaseImage();
 
-	t_ventana.LoadTGA("ventana.tga");
-	t_ventana.BuildGLTexture();
-	t_ventana.ReleaseImage();
+	//Carga de Figuras
+	kit._3dsLoad("rocket.3DS");	
+	//kit.VertexNormals();
+	
+	llanta._3dsLoad("k_rueda.3ds");
+
+
+	objCamera.Position_Camera(10,2.5f,13, 10,2.5f,10, 0, 1, 0);
 
 }
 
-
-void renderBitmapCharacter(float x, float y, float z, void *font,char *string)
+void pintaTexto(float x, float y, float z, void *font,char *string)
 {
   
   char *c;     //Almacena los caracteres a escribir
@@ -103,312 +133,151 @@ void renderBitmapCharacter(float x, float y, float z, void *font,char *string)
 
 
 
-void prisma (GLuint textura1, GLuint textura2)  //Funcion creacion prisma
-{
-
-	GLfloat vertice [12][3] = {
-				{0.5 ,-0.5, 0.5},    //Coordenadas Vértice 0 V0
-				{-0.5 ,-0.5, 0.5},    //Coordenadas Vértice 1 V1
-				{-0.5 ,-0.5, -0.5},    //Coordenadas Vértice 2 V2
-				{0.5 ,-0.5, -0.5},    //Coordenadas Vértice 3 V3
-				{0.5 ,0.5, 0.5},    //Coordenadas Vértice 4 V4
-				{0.5 ,0.5, -0.5},    //Coordenadas Vértice 5 V5
-				{-0.5 ,0.5, -0.5},    //Coordenadas Vértice 6 V6
-				{-0.5 ,0.5, 0.5},    //Coordenadas Vértice 7 V7
-				};
-
-		
-		glBindTexture(GL_TEXTURE_2D, textura2);   // choose the texture to use.
-		glBegin(GL_POLYGON);	//Front
-			glColor3f(1.0,1.0,1.0);
-			glNormal3f( 0.0f, 0.0f, 1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[1]);
-			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[0]);
-			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[4]);
-			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[7]);
-		glEnd();
-	
-		glBegin(GL_POLYGON);	//Right
-			glNormal3f( 1.0f, 0.0f, 0.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);
-			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[3]);
-			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[5]);
-			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[4]);
-		glEnd();
-
-		glBegin(GL_POLYGON);	//Back
-			glNormal3f( 0.0f, 0.0f,-1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[3]);
-			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[2]);
-			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[6]);
-			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[5]);
-		glEnd();
-
-		glBegin(GL_POLYGON);  //Left
-			glNormal3f(-1.0f, 0.0f, 0.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[1]);
-			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[2]);
-			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[6]);
-			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[7]);
-		glEnd();
-
-		glBegin(GL_POLYGON);  //Bottom
-			glNormal3f( 0.0f,-1.0f, 0.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);
-			glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertice[1]);
-			glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[2]);
-			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[3]);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, textura1);   // choose the texture to use.
-		glBegin(GL_POLYGON);  //Top0
-			glNormal3f( 0.0f, 1.0f, 0.0f);
-			glTexCoord2f(4.0, 0.0f); glVertex3fv(vertice[4]);
-			glTexCoord2f(4.0, 4.0f); glVertex3fv(vertice[5]);
-			glTexCoord2f(0.0, 4.0f); glVertex3fv(vertice[6]);
-			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[7]);
-		glEnd();
-}
-
-
 void display ( void )   // Creamos la funcion donde se dibuja
 {
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glLoadIdentity();
-
-	glTranslatef(pos_camX, pos_camY, pos_camZ);
-	glRotatef(eye_camX, 1.0, 0.0, 0.0);
-	glRotatef(eye_camY, 0.0, 1.0, 0.0);
-	glRotatef(eye_camZ, 0.0, 0.0, 1.0);
-
-	glPushMatrix();		//suelo-pasto
-	glTranslatef(0.0, 0.0, 0.0);
-	glScalef(7.5,0.1,7.5);
-	prisma(t_pasto.GLindex, t_pasto.GLindex);
-	glPopMatrix();
-
-	//paredes
-	/*glPushMatrix();		
-	glTranslatef(0.0,1.76,-1.0);
-	glScalef(3.5, 3.5, 4.0);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();*/
-
-	glPushMatrix(); //front
-	glTranslatef(-1.125, 0.9, 1.0);
-	glScalef(1.25, 1.8, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(1.125, 0.9, 1.0);
-	glScalef(1.25, 1.8, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0.0, 2.2125, 1.0);
-	glScalef(3.5, 0.825, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0.0, 3.4375, 1.0);
-	glScalef(3.5, 0.125, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-1.5, 3.0, 1.0);
-	glScalef(0.5, 0.765, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(1.5, 3.0, 1.0);
-	glScalef(0.5, 0.765, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //izq
-	glTranslatef(-1.75, 0.625, -1.0);
-	glScalef(0.09, 1.25, 4.0);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); 
-	glTranslatef(-1.75, 3.375, -1.0);
-	glScalef(0.09, 0.25, 4.0);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-1.75, 2.25, -2.625);
-	glScalef(0.09, 2.0, 0.75);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-1.75, 2.25, 0.625);
-	glScalef(0.09, 2.0, 0.75);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //der
-	glTranslatef(1.75, 0.625, -1.0);
-	glScalef(0.09, 1.25, 4.0);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(1.75, 3.375, -1.0);
-	glScalef(0.09, 0.25, 4.0);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(1.75, 2.25, -2.625);
-	glScalef(0.09, 2.0, 0.75);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(1.75, 2.25, 0.625);
-	glScalef(0.09, 2.0, 0.75);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //trasero
-	glTranslatef(0.0, 1.75, -3.0);
-	glScalef(3.5, 3.5, 0.09);
-	prisma(t_madera.GLindex, t_madera.GLindex);
-	glPopMatrix();
-	//fin paredes
-
-	//piso
-	glPushMatrix(); //trasero
-	glTranslatef(0.0, 0.1, -1.0);
-	glScalef(3.5, 0.09, 4.0);
-	prisma(t_madera_2.GLindex, t_madera_2.GLindex);
-	glPopMatrix();
-
-
-	glPushMatrix();		//techo
-	glTranslatef(0.0, 3.51, -1.0);
-	glScalef(4.0, 0.1, 4.5);
-	prisma(t_techo.GLindex, t_techo.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//tejado
-	glTranslatef(0.0, 2.0, 2.0);
-	glRotatef(18.0, 1.0, 0.0, 0.0);
-	glScalef(3.5, 0.1, 2.0);	
-	prisma(t_techo.GLindex, t_techo.GLindex);
-	glPopMatrix();
 	
-	glPushMatrix();		//suelo-adoquin
-	glTranslatef(0.0, 0.05, 2.25);
-	glScalef(1.0, 0.01, 3.0);
-	prisma(t_adoquin.GLindex, t_adoquin.GLindex);
+	glPushMatrix();
+
+		glRotatef(g_lookupdown,1.0f,0,0);
+
+		gluLookAt(	objCamera.mPos.x,  objCamera.mPos.y,  objCamera.mPos.z,	
+					objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,	
+					objCamera.mUp.x,   objCamera.mUp.y,   objCamera.mUp.z);
+	
+
+		glPushMatrix();		
+			glPushMatrix(); //Creamos cielo
+				glDisable(GL_LIGHTING);
+				glTranslatef(0,60,0);
+				fig1.skybox(130.0, 130.0, 130.0,text1.GLindex);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix();
+				//Para que el coche conserve sus colores
+				glDisable(GL_COLOR_MATERIAL);				
+				glScalef(0.01, 0.01, 0.01);	
+				glTranslatef(movKit, 1000, 0);
+				glRotatef(rotRocket, 0.0, 1.0, 0.0);
+				
+				//Pongo aquí el cohete
+				kit.GLrender(NULL,_SHADED,1.0);  //_WIRED O _POINTS				
+			glPopMatrix();
+			
+
+
+			//Para que el comando glColor funcione con iluminacion
+			glEnable(GL_COLOR_MATERIAL);
+			
+			glPushMatrix(); //Flecha
+				glScalef(7,0.1,7);
+				glDisable(GL_LIGHTING);
+				fig3.prisma_anun(text3.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix(); //Camino1
+				glTranslatef(23.5,0.0,0.0);
+				glScalef(40,0.1,7);
+				glDisable(GL_LIGHTING);
+				fig3.prisma2(text4.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix(); //Camino2
+				glTranslatef(-23.5,0.0,0.0);
+				glScalef(40,0.1,7);
+				glDisable(GL_LIGHTING);
+				fig3.prisma2(text4.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix(); //Pasto
+				glTranslatef(0.0,0.0,-4.0);
+				glScalef(87,0.1,1);
+				glDisable(GL_LIGHTING);
+				fig4.prisma2(text5.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix(); //Pasto
+				glTranslatef(0.0,0.0,4.0);
+				glScalef(87,0.1,1);
+				glDisable(GL_LIGHTING);
+				fig4.prisma2(text5.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix(); //Casa01
+				glTranslatef(0.0,3.0,7.0);
+				glRotatef(90,1,0,0);
+				glRotatef(180,0,0,1);
+				glScalef(6,5.0,6);
+				glDisable(GL_LIGHTING);
+				fig5.prisma2(text6.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glPushMatrix(); //Casa01
+				glTranslatef(0.0,3.0,-7.0);
+				glRotatef(90,1,0,0);
+				glScalef(6,5.0,6);
+				glDisable(GL_LIGHTING);
+				fig5.prisma2(text6.GLindex, 0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
+			glColor3f(1.0,1.0,1.0);
+
+		glPopMatrix();
 	glPopMatrix();
 
-	glPushMatrix();		//poste-izq
-	glTranslatef(-1.5, 0.9, 2.75);
-	glScalef(0.15, 1.8, 0.15);
-	prisma(t_madera_2.GLindex, t_madera_2.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//poste-der
-	glTranslatef(1.5, 0.9, 2.75);
-	glScalef(0.13, 1.8, 0.13);
-	prisma(t_madera_2.GLindex, t_madera_2.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//puerta
-	glTranslatef(0.0, 0.9, 1.0);
-	glScalef(1.0, 1.8, 0.09);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER,0.0);
-	prisma(t_madera.GLindex, t_puerta.GLindex);
-	glDisable(GL_ALPHA_TEST);
-	glPopMatrix();
-
-	//Setos
-	glPushMatrix();		//trasero
-	glTranslatef(0.0, 0.5, -3.20);
-	glScalef(4.3, 1.0, 0.4);
-	prisma(t_seto.GLindex, t_seto.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//izquierdo
-	glTranslatef(-1.95, 0.5, -1.0);
-	glScalef(0.4, 1.0, 4.0);
-	prisma(t_seto.GLindex, t_seto.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//derecho
-	glTranslatef(1.95, 0.5, -1.0);
-	glScalef(0.4, 1.0, 4.0);
-	prisma(t_seto.GLindex, t_seto.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//frontal izquierdo
-	glTranslatef(-1.325, 0.5, 1.20);
-	glScalef(1.65, 1.0, 0.4);
-	prisma(t_seto.GLindex, t_seto.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();		//frontal derecho
-	glTranslatef(1.325, 0.5, 1.20);
-	glScalef(1.65, 1.0, 0.4);
-	prisma(t_seto.GLindex, t_seto.GLindex);
-	glPopMatrix();
-
-	//Ventanas
-	glPushMatrix();		//frontal 
-	glTranslatef(0.0, 3.0, 1.0);
-	glScalef(2.5, 0.75, 0.09);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0);
-	prisma(t_madera.GLindex, t_ventana.GLindex);
-	glDisable(GL_ALPHA_TEST);
-	glPopMatrix();
-
-	glPushMatrix();		//izquierda
-	glTranslatef(-1.75, 2.25, -1.0);
-	glScalef(0.09, 2.0, 2.5);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0);
-	prisma(t_madera.GLindex, t_ventana.GLindex);
-	glDisable(GL_ALPHA_TEST);
-	glPopMatrix();
-
-	glPushMatrix();		//derecha
-	glTranslatef(1.75, 2.25, -1.0);
-	glScalef(0.09, 2.0, 2.5);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0);
-	prisma(t_madera.GLindex, t_ventana.GLindex);
-	glDisable(GL_ALPHA_TEST);
-	glPopMatrix();
-
-
-	/*glDisable(GL_TEXTURE_2D);
-		renderBitmapCharacter(-11, 12.0, -14.0, (void *)font, "Practica 8");
-		renderBitmapCharacter(-11, 10.5, -14, (void *)font, "Texturas");
-	glEnable(GL_TEXTURE_2D);*/
-
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+		glColor3f(1.0,0.0,0.0);
+		pintaTexto(-12,12.0,-14.0,(void *)font,"Practica 10");
+		pintaTexto(-12,10.5,-14,(void *)font,"Poner algo en Movimiento");
+		glColor3f(1.0,1.0,1.0);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
 
 	glutSwapBuffers ( );
+
 }
 
-void animacion() {
-	dwCurrentTime = GetTickCount(); // Even better to use timeGetTime()
-	dwElapsedTime = dwCurrentTime - dwLastUpdateTime;
-	if (dwElapsedTime >= 30) {
-		eye_camY = (eye_camY + 2)%360;
-		dwLastUpdateTime = dwCurrentTime;
+
+void animacion()
+{
+	
+	fig3.text_izq-= 0.001;
+	fig3.text_der-= 0.001;
+	if(fig3.text_izq<-1)
+		fig3.text_izq=0;
+	if(fig3.text_der<0)
+		fig3.text_der=1;
+
+
+	if(g_fanimacion)
+	{		
+		if (rot_anim) {
+			i++;
+			rotRocket += 5;
+			if (i==36) 
+				rot_anim = false;											
+			if (rotRocket == 360)
+				rotRocket = 0;
+		}
+		else {
+			if ((movKit == 4000.0 && sentido == 1.0) || (movKit == -4000.0 && sentido == -1.0)) {
+				rot_anim = true;
+				sentido *= -1.0;
+				i = 0;
+			}else
+				movKit += 40.0*sentido;
+		}	
 	}
 	glutPostRedisplay();
 }
@@ -427,93 +296,84 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 	// Tipo de Vista
 	
-	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 50.0);
+	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 170.0);
 
 	glMatrixMode(GL_MODELVIEW);							// Seleccionamos Modelview Matrix
 	glLoadIdentity();
 }
-
 
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 		case 'W':
-			pos_camZ += 0.5f;
-			//eye_camZ -= 0.5f;
+			objCamera.Move_Camera( CAMERASPEED+0.2 );
 			break;
 
 		case 's':
 		case 'S':
-			pos_camZ -= 0.5f;
-			//eye_camZ += 0.5f;
+			objCamera.Move_Camera(-(CAMERASPEED+0.2));
 			break;
 
 		case 'a':
 		case 'A':
-			pos_camX += 0.5f;
-			//eye_camX -= 0.5f;
+			objCamera.Strafe_Camera(-(CAMERASPEED+0.4));
 			break;
+
 		case 'd':
 		case 'D':
-			pos_camX -= 0.5f;
-			//eye_camX += 0.5f;
+			objCamera.Strafe_Camera( CAMERASPEED+0.4 );
 			break;
-		case 'q':
-		case 'Q':
-			pos_camY += 0.5f;
+
+		case ' ':		//Poner algo en movimiento
+			g_fanimacion^= true; //Activamos/desactivamos la animacíon
 			break;
-		case 'e':
-		case 'E':
-			pos_camY -= 0.5f;
+
+		case 'r':
+		case 'R':
+			movKit=0.0;
+			g_fanimacion=false;
 			break;
-		case 'i':
-		case 'I':
-			eye_camZ = (eye_camZ+15) % 360;
-			break;
-		case 'k':
-		case 'K':
-			eye_camZ = (eye_camZ-15) % 360;
-			break;
+
 		case 27:        // Cuando Esc es presionado...
 			exit ( 0 );   // Salimos del programa
 			break;        
 		default:        // Cualquier otra
 			break;
   }
-	glutPostRedisplay();
+
+  glutPostRedisplay();
 }
 
 void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas especiales (arrow keys)
 {
   switch ( a_keys ) {
 	case GLUT_KEY_PAGE_UP:
-		pos_camY -= 0.5f;
-		//eye_camY += 0.5f;
+		objCamera.UpDown_Camera(CAMERASPEED);
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
-		pos_camY += 0.5f;
-		//eye_camY -= 0.5f;
+		objCamera.UpDown_Camera(-CAMERASPEED);
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
-		eye_camX = (eye_camX-15) % 360;
+		g_lookupdown -= 1.0f;
 		break;
 
     case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
-		eye_camX = (eye_camX+15) % 360;
+		g_lookupdown += 1.0f;
 		break;
 
 	case GLUT_KEY_LEFT:
-		eye_camY = (eye_camY-15) % 360;
+		objCamera.Rotate_View(-CAMERASPEED);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		eye_camY = (eye_camY+15) % 360;
+		objCamera.Rotate_View( CAMERASPEED);
 		break;
+
     default:
-      break;
+		break;
   }
   glutPostRedisplay();
 }
@@ -523,9 +383,9 @@ int main ( int argc, char** argv )   // Main Function
 {
   glutInit            (&argc, argv); // Inicializamos OpenGL
   glutInitDisplayMode (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
-  glutInitWindowSize  (1000, 800);	// Tamaño de la Ventana
+  glutInitWindowSize  (500, 500);	// Tamaño de la Ventana
   glutInitWindowPosition (0, 0);	//Posicion de la Ventana
-  glutCreateWindow    ("Practica 8"); // Nombre de la Ventana
+  glutCreateWindow    ("Practica 10"); // Nombre de la Ventana
   //glutFullScreen     ( );         // Full Screen
   InitGL ();						// Parametros iniciales de la aplicacion
   glutDisplayFunc     ( display );  //Indicamos a Glut función de dibujo
